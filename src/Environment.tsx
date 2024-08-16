@@ -13,8 +13,8 @@ export default class Environment extends Phaser.Scene{
     create ()
     {
         const mapData = new Phaser.Tilemaps.MapData({
-            width: 3,
-            height: 3,
+            width: 10,
+            height: 10,
             tileWidth: 16,
             tileHeight: 8,
             orientation: Phaser.Tilemaps.Orientation.ISOMETRIC,
@@ -25,26 +25,54 @@ export default class Environment extends Phaser.Scene{
 
         const tileset = map.addTilesetImage('tileset', 'tiles')
 
-        const layer = tileset ? map.createBlankLayer('layer', tileset, 350, 200) : null
+        const floor = tileset ? map.createBlankLayer('floor', tileset, 400, 300) : null
+        const block = tileset ? map.createBlankLayer('block', tileset, 400, 300) : null
 
-        const data = [
-            [ 0, 0, 0],
-            [ 0, 0, 0 ],
-            [ 0, 0, 0 ],
-        ]
+        const data = { 
+            floor: [
+                [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
+                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ]
+            ], 
+            block: [
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, 1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, 3, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, 3, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
+            ]
+        }
 
         let y = 0
 
-        data.forEach(row => {
-
+        data.floor.forEach(row => {
             row.forEach((tile, x) => {
-
-                layer?.putTileAt(tile, x, y)
-
+                floor?.putTileAt(tile, x, y)
             })
 
             y++
+        })
 
+        y = 0
+
+        data.block.forEach(row => {
+            row.forEach((tile, x) => {
+                tile !== -1 ? block?.putTileAt(tile, x, y) : ""
+            }) 
+
+            y++
         })
     }
 }
