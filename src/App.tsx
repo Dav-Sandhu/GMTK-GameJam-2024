@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as Phaser from 'phaser'
-import Environment from './Environment'
+import Config from './Config'
 import './App.scss'
 
 function App() {
@@ -8,24 +8,7 @@ function App() {
   const gameRef = useRef(null)
 
   useEffect(() => {
-    
-    new Phaser.Game({
-      type: Phaser.AUTO,
-      parent: gameRef.current || "",
-      pixelArt: true,
-      antialias: false,
-      backgroundColor: '#ffffff',
-      width: 800,
-      height: 600,
-      physics: {
-        default: 'matter',
-        matter: {
-          gravity: { y: 0, x: 0 },
-          //debug: true,
-        },
-      },
-      scene: Environment,
-    })
+    new Phaser.Game(Config(gameRef))
   }, [])
 
   return (

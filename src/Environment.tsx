@@ -7,7 +7,7 @@ export default class Environment extends Phaser.Scene{
 
     preload ()
     {
-        this.load.image('tiles', '/iso-64x64-outside.png')
+        this.load.image('tiles', '/tileset.png')
     }
 
     create ()
@@ -15,22 +15,22 @@ export default class Environment extends Phaser.Scene{
         const mapData = new Phaser.Tilemaps.MapData({
             width: 3,
             height: 3,
-            tileWidth: 64,
-            tileHeight: 32,
+            tileWidth: 16,
+            tileHeight: 8,
             orientation: Phaser.Tilemaps.Orientation.ISOMETRIC,
             format: Phaser.Tilemaps.Formats.ARRAY_2D
         })
 
         const map = new Phaser.Tilemaps.Tilemap(this, mapData)
 
-        const tileset = map.addTilesetImage('iso-64x64-outside', 'tiles')
+        const tileset = map.addTilesetImage('tileset', 'tiles')
 
         const layer = tileset ? map.createBlankLayer('layer', tileset, 350, 200) : null
 
         const data = [
-            [ 179, 178,  174],
-            [ 175, 174, 175 ],
-            [ 174, 175, 174 ],
+            [ 0, 0, 0],
+            [ 0, 0, 0 ],
+            [ 0, 0, 0 ],
         ]
 
         let y = 0
