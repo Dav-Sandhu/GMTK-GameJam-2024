@@ -5,11 +5,17 @@ export default class Environment extends Phaser.Scene{
 
     player: Player | null
     ground: Phaser.Tilemaps.TilemapLayer | null
+    walls: Phaser.Tilemaps.TilemapLayer | null
+    stack: Phaser.Tilemaps.TilemapLayer | null
+    roofs: Phaser.Tilemaps.TilemapLayer | null
 
     constructor(){
         super()
         this.player = null
         this.ground = null
+        this.stack = null
+        this.walls = null
+        this.roofs = null
     }
 
     preload ()
@@ -27,21 +33,20 @@ export default class Environment extends Phaser.Scene{
         if (tileset !== null){
             this.ground = map.createLayer('ground', tileset)
             const boundary = map.createLayer('boundary', tileset)
-            const walls = map.createLayer('walls', tileset)
+            this.walls = map.createLayer('walls', tileset)
 
-            map.createLayer('roofs', tileset)
+            this.roofs = map.createLayer('roofs', tileset)
+            this.stack = map.createLayer('stack', tileset)
 
             this.player = new Player(this.matter.world, 100, 100, 'player', this, 50)
             this.add.existing(this.player)
 
-            map.createLayer('stack', tileset)
-
             boundary?.setCollisionFromCollisionGroup()
-            walls?.setCollisionFromCollisionGroup()
+            this.walls?.setCollisionFromCollisionGroup()
             this.ground?.setCollisionFromCollisionGroup()
 
             boundary ? this.matter.world.convertTilemapLayer(boundary) : null
-            walls ? this.matter.world.convertTilemapLayer(walls) : null
+            this.walls ? this.matter.world.convertTilemapLayer(this.walls) : null
             this.ground ? this.matter.world.convertTilemapLayer(this.ground) : null
         }
 
@@ -87,6 +92,24 @@ export default class Environment extends Phaser.Scene{
     update(time: number, delta: number){
         if (this.player !== null){
             this.player.movPlayer(delta)
+
+            const layers = [this.stack, this.walls, this.roofs]
+
+            layers.forEach(layer => {
+                layer?.forEachTile(tile => {
+                    const tileWorldX = tile.getCenterX()
+                    const tileWorldY = tile.getCenterY()
+                    const playerBounds = this.player?.getBounds()
+
+                    if (playerBounds && Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, new Phaser.Geom.Rectangle(tileWorldX, tileWorldY, tile.width, tile.height))) {
+                        tile.setAlpha(0.5) // Set transparency
+                        this.player?.setAlpha(0.5)
+                    } else {
+                        tile.setAlpha(1) // Reset transparency
+                        this.player?.setAlpha(1)
+                    }
+                })
+            })
         }
     }
 }
