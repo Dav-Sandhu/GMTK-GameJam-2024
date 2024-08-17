@@ -30,24 +30,24 @@ export default class Environment extends Phaser.Scene{
 
         const data = { 
             floor: [
-                [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ],
-                [ 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0 ]
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+                [8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
             ], 
             block: [
                 [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
                 [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
-                [ -1, -1, 1, -1, -1, -1, -1, -1, -1, -1 ],
-                [ -1, -1, -1, 3, -1, -1, -1, -1, -1, -1 ],
-                [ -1, -1, -1, -1, 1, -1, -1, -1, -1, -1 ],
-                [ -1, -1, -1, -1, -1, 3, -1, -1, -1, -1 ],
+                [ -1, -1, 1, 1, 1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, 9, 9, 9, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+                [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
                 [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
                 [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
                 [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
@@ -69,10 +69,30 @@ export default class Environment extends Phaser.Scene{
 
         data.block.forEach(row => {
             row.forEach((tile, x) => {
-                tile !== -1 ? block?.putTileAt(tile, x, y) : ""
+                tile !== -1 ? block?.putTileAt(tile, x, y) : null
             }) 
 
             y++
+        })
+
+        this.cameras.main.zoomTo(5, 0)
+
+        this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            if (pointer.isDown) {
+                const panSpeed = 0.15
+                this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) * panSpeed;
+                this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) * panSpeed;
+            }
+        })
+
+        this.input.on('wheel', ({ deltaY }: { deltaY: number }) => {
+            if (deltaY > 0) {
+                this.cameras.main.zoom -= 0.25
+            } else {
+                this.cameras.main.zoom += 0.25
+            }
+
+            this.cameras.main.zoom = Phaser.Math.Clamp(this.cameras.main.zoom, 1, 5)
         })
     }
 }

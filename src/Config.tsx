@@ -7,7 +7,7 @@ export default function Config(ref: React.RefObject<HTMLInputElement>){
         parent: ref.current || "",
         pixelArt: true,
         antialias: false,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#02CCFE',
         width: 800,
         height: 600,
         physics: {
