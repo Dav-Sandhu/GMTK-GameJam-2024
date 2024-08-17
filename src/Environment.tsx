@@ -18,7 +18,8 @@ export default class Environment extends Phaser.Scene{
 
         if (tileset !== null){
             map.createLayer('ground', tileset)
-            map.createLayer('game', tileset)
+            map.createLayer('walls', tileset)
+            map.createLayer('roofs', tileset)
         }
 
         //center the map
