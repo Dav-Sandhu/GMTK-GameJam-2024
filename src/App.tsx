@@ -13,7 +13,7 @@ function App() {
 
   return (
     <div className="home">
-      <h1>GMTK Game Jam 2024</h1>
+      <h1>Scale the Wall (2024)</h1>
       <div id="game" ref={gameRef}></div>
     </div>
   )
