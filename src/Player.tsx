@@ -2,6 +2,8 @@ import * as Phaser from 'phaser'
 import Environment from './Environment'
 
 export default class Player extends Phaser.Physics.Matter.Image{
+    
+    scene: Environment
     speed: number
     mov_x: number
     mov_y: number
@@ -10,23 +12,24 @@ export default class Player extends Phaser.Physics.Matter.Image{
         world: Phaser.Physics.Matter.World, 
         x: number, y: number, 
         texture: string | Phaser.Textures.Texture, 
+        scene: Environment,
         speed: number){
         
         super(world, x, y, texture)
 
+        this.scene = scene
+
         this.speed = speed
         this.mov_x = 0
         this.mov_y = 0
-    }
 
-    movPlayer(delta: number){
-        this.setVelocity(this.mov_x * this.speed * (delta / 1000), this.mov_y * this.speed * (delta / 1000))
-    }
+        this.setRectangle(10, 4, { isStatic: false })
+        this.setOrigin(0.5, 30/32)
+        this.setFixedRotation()
 
-    getInput(scene: Environment){
-        scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            const worldPoint = pointer.positionToCamera(scene.cameras.main) as Phaser.Math.Vector2
-            const tile = scene.ground?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
+        this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+            const worldPoint = pointer.positionToCamera(this.scene.cameras.main) as Phaser.Math.Vector2
+            const tile = this.scene.ground?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
 
             if (tile && pointer.isDown) {
                 const targetX = tile.getCenterX()
@@ -38,9 +41,13 @@ export default class Player extends Phaser.Physics.Matter.Image{
             }
         })
 
-        scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+        this.scene.input.on('pointerup', () => {
             this.mov_x = 0
             this.mov_y = 0
         })
+    }
+
+    movPlayer(delta: number){
+        this.setVelocity(this.mov_x * this.speed * (delta / 1000), this.mov_y * this.speed * (delta / 1000))
     }
 }

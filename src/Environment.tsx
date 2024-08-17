@@ -27,22 +27,28 @@ export default class Environment extends Phaser.Scene{
         if (tileset !== null){
             this.ground = map.createLayer('ground', tileset)
 
-            this.player = new Player(this.matter.world, 0, 0, 'player', 50)
-            this.add.existing(this.player)
-            this.player.getInput(this)
+            const walls = map.createLayer('walls', tileset)
 
-            map.createLayer('walls', tileset)
             map.createLayer('roofs', tileset)
+
+            this.player = new Player(this.matter.world, 100, 100, 'player', this, 50)
+            this.add.existing(this.player)
+
+            walls?.setCollisionFromCollisionGroup()
+            this.ground?.setCollisionFromCollisionGroup()
+
+            walls ? this.matter.world.convertTilemapLayer(walls) : null
+            this.ground ? this.matter.world.convertTilemapLayer(this.ground) : null
         }
 
         //moves the camera to the map in the center of the screen
         this.cameras.main.setScroll(
-            (map.widthInPixels - this.cameras.main.width) / 1.7, 
+            (map.widthInPixels - this.cameras.main.width) / 2, 
             (map.heightInPixels - this.cameras.main.height) / 2
         )
 
         //default camera zoom
-        this.cameras.main.zoomTo(2, 0)
+        this.cameras.main.zoomTo(4, 0)
         
         //when mouse moves it will highlight the tile it is hovering over, and it will pan if left click hold + move around
         this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {

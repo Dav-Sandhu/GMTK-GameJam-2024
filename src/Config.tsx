@@ -14,7 +14,7 @@ export default function Config(ref: React.RefObject<HTMLInputElement>){
             default: 'matter',
             matter: {
             gravity: { y: 0, x: 0 },
-            //debug: true,
+            debug: true,
             },
         },
         scene: Environment,
