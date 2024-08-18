@@ -23,8 +23,8 @@ export default class Player extends Phaser.Physics.Matter.Image{
         this.mov_x = 0
         this.mov_y = 0
 
-        this.setRectangle(10, 4, { isStatic: false })
-        this.setOrigin(0.5, 30/32)
+        this.setRectangle(8, 2, { isStatic: false })
+        this.setOrigin(0.5, 14/16)
         this.setFixedRotation()
 
         this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {

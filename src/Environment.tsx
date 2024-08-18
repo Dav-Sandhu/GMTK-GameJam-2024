@@ -1,5 +1,6 @@
 import Phaser from "phaser"
 import Player from './Player'
+import Enemy from './Enemy'
 
 export default class Environment extends Phaser.Scene{
 
@@ -8,6 +9,7 @@ export default class Environment extends Phaser.Scene{
     walls: Phaser.Tilemaps.TilemapLayer | null
     stack: Phaser.Tilemaps.TilemapLayer | null
     roofs: Phaser.Tilemaps.TilemapLayer | null
+    enemy: Enemy | null
 
     constructor(){
         super()
@@ -16,12 +18,14 @@ export default class Environment extends Phaser.Scene{
         this.stack = null
         this.walls = null
         this.roofs = null
+        this.enemy = null
     }
 
     preload ()
     {
         this.load.image('tiles', '/tileset.png')
         this.load.image('player', '/player.png')
+        this.load.image('arrow', '/arrow.png')
         this.load.tilemapTiledJSON('map', '/map01.json')
     }
 
@@ -40,6 +44,9 @@ export default class Environment extends Phaser.Scene{
 
             this.player = new Player(this.matter.world, 100, 100, 'player', this, 50)
             this.add.existing(this.player)
+
+            this.enemy = new Enemy(this.matter.world, 80, 60, 'player', this, this.player)
+            this.add.existing(this.enemy)
 
             boundary?.setCollisionFromCollisionGroup()
             this.walls?.setCollisionFromCollisionGroup()
@@ -100,13 +107,21 @@ export default class Environment extends Phaser.Scene{
                     const tileWorldX = tile.getCenterX()
                     const tileWorldY = tile.getCenterY()
                     const playerBounds = this.player?.getBounds()
+                    playerBounds ? playerBounds.y += 14 : null
+                    playerBounds ? playerBounds.height = 2 : null
 
-                    if (playerBounds && Phaser.Geom.Intersects.RectangleToRectangle(playerBounds, new Phaser.Geom.Rectangle(tileWorldX, tileWorldY, tile.width, tile.height))) {
-                        tile.setAlpha(0.5) // Set transparency
-                        this.player?.setAlpha(0.5)
+                    if (
+                        playerBounds && 
+                        Phaser.Geom.Intersects.RectangleToRectangle(
+                            playerBounds, 
+                            new Phaser.Geom.Rectangle(
+                                tileWorldX, tileWorldY, tile.width, tile.height
+                            )
+                        )
+                    ){
+                        tile.setAlpha(0.5)
                     } else {
-                        tile.setAlpha(1) // Reset transparency
-                        this.player?.setAlpha(1)
+                        tile.setAlpha(1)
                     }
                 })
             })
