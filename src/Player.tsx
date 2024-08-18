@@ -7,7 +7,9 @@ export default class Player extends Phaser.Physics.Matter.Image {
     mov_x: number
     mov_y: number
     health: number
+    maxHealth: number
     sprite: Phaser.GameObjects.Sprite
+    healthBar: Phaser.GameObjects.Graphics
 
     constructor(
         world: Phaser.Physics.Matter.World, 
@@ -21,6 +23,7 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.scene = scene
         this.speed = speed
         this.health = health
+        this.maxHealth = health
         this.mov_x = 0
         this.mov_y = 0
 
@@ -34,6 +37,10 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.sprite = this.scene.add.sprite(x, y, texture)
         this.sprite.setOrigin(0.5, 14/16)
 
+        this.healthBar = this.scene.add.graphics()
+        this.healthBar.setDepth(50)
+        this.updateHealthBar()
+
         this.scene.anims.create({
             key: 'walk-right',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [1, 2, 3, 4, 5, 6] }),
@@ -44,6 +51,20 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.scene.anims.create({
             key: 'walk-left',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [33, 34, 35, 36, 37, 38] }),
+            frameRate: 8,
+            repeat: -1
+        })
+
+        this.scene.anims.create({
+            key: 'walk-up',
+            frames: this.scene.anims.generateFrameNumbers('player', { frames: [65, 66, 67, 68, 69, 70] }),
+            frameRate: 8,
+            repeat: -1
+        })
+
+        this.scene.anims.create({
+            key: 'walk-down',
+            frames: this.scene.anims.generateFrameNumbers('player', { frames: [97, 98, 99, 100, 101, 102] }),
             frameRate: 8,
             repeat: -1
         })
@@ -68,6 +89,22 @@ export default class Player extends Phaser.Physics.Matter.Image {
         })
     }
 
+    updateHealthBar() {
+        this.healthBar.clear()
+
+        //red bar showing lost health
+        this.healthBar.fillStyle(0xff0000)
+        this.healthBar.fillRect(this.x - 8, this.y - 20, 16, 2)
+
+        //green health bar
+        this.healthBar.fillStyle(0x00ff00)
+        this.healthBar.fillRect(this.x - 8, this.y - 20, 16 * (this.health / this.maxHealth), 2)
+
+        if (this.health <= 0) {
+            this.scene.scene.restart()
+        }
+    }
+
     movPlayer(delta: number) {
         this.setVelocity(
             this.mov_x * this.speed * (delta / 1000), 
@@ -76,6 +113,7 @@ export default class Player extends Phaser.Physics.Matter.Image {
 
         // Sync the sprite position with the Matter image
         this.sprite.setPosition(this.x, this.y)
+        this.updateHealthBar()
 
         if (this.mov_x !== 0 || this.mov_y !== 0) {
             this.mov_x > 0 ? this.sprite.anims.play('walk-right', true) : this.sprite.anims.play('walk-left', true)
