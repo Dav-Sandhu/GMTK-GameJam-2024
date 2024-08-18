@@ -25,7 +25,6 @@ export default class Environment extends Phaser.Scene{
     {
         this.load.image('tiles', '/tileset.png')
         this.load.spritesheet('player', '/player.png', { frameWidth: 16, frameHeight: 16 })
-        //this.load.image('player', '/player.png')
         this.load.image('arrow', '/arrow.png')
         this.load.tilemapTiledJSON('map', '/map01.json')
     }
@@ -80,7 +79,7 @@ export default class Environment extends Phaser.Scene{
             this.roofs?.setDepth(20)
             this.stack?.setDepth(30)
             this.enemy?.setDepth(40)
-            this.player?.setDepth(40)
+            this.player?.sprite?.setDepth(40)
         }
 
         //moves the camera to the map in the center of the screen
@@ -130,9 +129,9 @@ export default class Environment extends Phaser.Scene{
                 const tileLeft = layer?.getTileAtWorldXY(playerX + 8, playerY - 4)
 
                 if (tile || tileLeft){
-                    this.player?.setDepth(1) //player is behind a block
+                    this.player?.sprite?.setDepth(1) //player is behind a block
                 }else{
-                    this.player?.setDepth(40) //player is in front of a block
+                    this.player?.sprite?.setDepth(40) //player is in front of a block
                 }
             })
         }
