@@ -44,7 +44,6 @@ export default class Environment extends Phaser.Scene{
 
             const playerTile = this.ground?.getTileAt(9, 37)
             const enemyTile = this.stack?.getTileAt(13, 1)
-            console.log(enemyTile)
 
             this.player = new Player(
                 this.matter.world, 
