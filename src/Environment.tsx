@@ -73,6 +73,12 @@ export default class Environment extends Phaser.Scene{
             boundary ? this.matter.world.convertTilemapLayer(boundary) : null
             this.walls ? this.matter.world.convertTilemapLayer(this.walls) : null
             this.ground ? this.matter.world.convertTilemapLayer(this.ground) : null
+
+            this.walls?.setDepth(10)
+            this.roofs?.setDepth(20)
+            this.stack?.setDepth(30)
+            this.enemy?.setDepth(40)
+            this.player?.setDepth(40)
         }
 
         //moves the camera to the map in the center of the screen
@@ -106,36 +112,36 @@ export default class Environment extends Phaser.Scene{
     }
 
     update(time: number, delta: number){
+
         if (this.player !== null){
             this.player.movPlayer(delta)
 
             time * 1 //in order to build you must not have any unused variables
 
-            const layers = [this.stack, this.walls, this.roofs]
+            const playerX = this.player.x
+            const playerY = this.player.y + 6 //the 6 offset to go from origin to location of collision shape
 
-            layers.forEach(layer => {
-                layer?.forEachTile(tile => {
-                    const tileWorldX = tile.getCenterX()
-                    const tileWorldY = tile.getCenterY()
-                    const playerBounds = this.player?.getBounds()
-                    playerBounds ? playerBounds.y += 14 : null
-                    playerBounds ? playerBounds.height = 2 : null
+            const wall = this.walls?.getTileAtWorldXY(playerX , playerY) || null
+            const stack = this.stack?.getTileAtWorldXY(playerX , playerY) || null
+            const roof = this.roofs?.getTileAtWorldXY(playerX , playerY) || null
 
-                    if (
-                        playerBounds && 
-                        Phaser.Geom.Intersects.RectangleToRectangle(
-                            playerBounds, 
-                            new Phaser.Geom.Rectangle(
-                                tileWorldX, tileWorldY, tile.width, tile.height
-                            )
-                        )
-                    ){
-                        tile.setAlpha(0.5)
-                    } else {
-                        tile.setAlpha(1)
-                    }
-                })
-            })
+            if (wall){
+                this.player.setDepth(1)
+            }else{
+                this.player.setDepth(40)
+            }
+            
+            if (stack){
+                this.player.setDepth(1)
+            }else{
+                this.player.setDepth(40)
+            }
+            
+            if (roof){
+                this.player.setDepth(1)
+            }else{
+                this.player.setDepth(40)
+            }
         }
     }
 }
