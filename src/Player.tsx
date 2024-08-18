@@ -7,19 +7,21 @@ export default class Player extends Phaser.Physics.Matter.Image{
     speed: number
     mov_x: number
     mov_y: number
+    health: number
 
     constructor(
         world: Phaser.Physics.Matter.World, 
         x: number, y: number, 
         texture: string | Phaser.Textures.Texture, 
         scene: Environment,
-        speed: number){
+        speed: number, health: number){
         
         super(world, x, y, texture)
 
         this.scene = scene
 
         this.speed = speed
+        this.health = health
         this.mov_x = 0
         this.mov_y = 0
 
@@ -48,6 +50,9 @@ export default class Player extends Phaser.Physics.Matter.Image{
     }
 
     movPlayer(delta: number){
-        this.setVelocity(this.mov_x * this.speed * (delta / 1000), this.mov_y * this.speed * (delta / 1000))
+        this.setVelocity(
+            this.mov_x * this.speed * (delta / 1000), 
+            this.mov_y * this.speed * (delta / 1000)
+        )
     }
 }

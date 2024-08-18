@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser'
 import Environment from './Environment'
+import Player from './Player'
 
 export default class Arrow extends Phaser.Physics.Matter.Image{
     scene: Environment
@@ -30,6 +31,14 @@ export default class Arrow extends Phaser.Physics.Matter.Image{
                 const pair = pairs[i]
     
                 if (pair.bodyA === this.body || pair.bodyB === this.body){
+
+                    const otherBody = pair.bodyA === this.body ? pair.bodyB : pair.bodyA
+
+                    if (otherBody.gameObject instanceof Player) {
+                        const player = otherBody.gameObject as Player
+                        player.health -= 1
+                    }
+
                     this.destroy()
                     break
                 }

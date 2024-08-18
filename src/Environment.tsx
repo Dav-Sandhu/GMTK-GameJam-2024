@@ -51,7 +51,8 @@ export default class Environment extends Phaser.Scene{
                 playerTile?.getCenterY() || 100, 
                 'player', 
                 this, 
-                50
+                50,
+                10
             )
             this.add.existing(this.player)
             this.cameras.main.startFollow(this.player)
@@ -113,35 +114,26 @@ export default class Environment extends Phaser.Scene{
 
     update(time: number, delta: number){
 
-        if (this.player !== null){
+        if (this.player){
             this.player.movPlayer(delta)
 
             time * 1 //in order to build you must not have any unused variables
-
+            
             const playerX = this.player.x
             const playerY = this.player.y + 6 //the 6 offset to go from origin to location of collision shape
 
-            const wall = this.walls?.getTileAtWorldXY(playerX , playerY) || null
-            const stack = this.stack?.getTileAtWorldXY(playerX , playerY) || null
-            const roof = this.roofs?.getTileAtWorldXY(playerX , playerY) || null
+            const layers = [this.walls, this.stack, this.roofs] //layers that have collidable blocks
 
-            if (wall){
-                this.player.setDepth(1)
-            }else{
-                this.player.setDepth(40)
-            }
-            
-            if (stack){
-                this.player.setDepth(1)
-            }else{
-                this.player.setDepth(40)
-            }
-            
-            if (roof){
-                this.player.setDepth(1)
-            }else{
-                this.player.setDepth(40)
-            }
+            layers.forEach(layer => {
+                const tile = layer?.getTileAtWorldXY(playerX, playerY)
+                const tileLeft = layer?.getTileAtWorldXY(playerX + 8, playerY - 4)
+
+                if (tile || tileLeft){
+                    this.player?.setDepth(1) //player is behind a block
+                }else{
+                    this.player?.setDepth(40) //player is in front of a block
+                }
+            })
         }
     }
 }
