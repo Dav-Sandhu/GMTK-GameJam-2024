@@ -42,10 +42,29 @@ export default class Environment extends Phaser.Scene{
             this.roofs = map.createLayer('roofs', tileset)
             this.stack = map.createLayer('stack', tileset)
 
-            this.player = new Player(this.matter.world, 100, 100, 'player', this, 50)
-            this.add.existing(this.player)
+            const playerTile = this.ground?.getTileAt(9, 37)
+            const enemyTile = this.stack?.getTileAt(13, 1)
+            console.log(enemyTile)
 
-            this.enemy = new Enemy(this.matter.world, 80, 60, 'player', this, this.player)
+            this.player = new Player(
+                this.matter.world, 
+                playerTile?.getCenterX() || 100, 
+                playerTile?.getCenterY() || 100, 
+                'player', 
+                this, 
+                50
+            )
+            this.add.existing(this.player)
+            this.cameras.main.startFollow(this.player)
+
+            this.enemy = new Enemy(
+                this.matter.world, 
+                enemyTile?.getCenterX() || 80, 
+                enemyTile?.getCenterY() || 60, 
+                'player', 
+                this, 
+                this.player
+            )
             this.add.existing(this.enemy)
 
             boundary?.setCollisionFromCollisionGroup()
@@ -66,22 +85,13 @@ export default class Environment extends Phaser.Scene{
         //default camera zoom
         this.cameras.main.zoomTo(2, 0)
         
-        //when mouse moves it will highlight the tile it is hovering over, and it will pan if left click hold + move around
+        //when mouse moves it will highlight the tile it is hovering over
         this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            
             this.ground?.forEachTile(t => t.tint = 0xffffff)
             const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2
             const tile = this.ground?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
+            tile ? tile.tint = 0xff0000 : null
             
-            if (pointer.isDown && !tile) {
-                const panSpeed = 0.15
-                this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) * panSpeed
-                this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) * panSpeed
-            }else {
-                const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2
-                const tile = this.ground?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
-                tile ? tile.tint = 0xff0000 : null
-            }
         })
 
         //scroll wheel will zoom in and out 
@@ -100,7 +110,7 @@ export default class Environment extends Phaser.Scene{
         if (this.player !== null){
             this.player.movPlayer(delta)
 
-            time * 1
+            time * 1 //in order to build you must not have any unused variables
 
             const layers = [this.stack, this.walls, this.roofs]
 
