@@ -100,6 +100,8 @@ export default class Environment extends Phaser.Scene{
         if (this.player !== null){
             this.player.movPlayer(delta)
 
+            time * 1
+
             const layers = [this.stack, this.walls, this.roofs]
 
             layers.forEach(layer => {
