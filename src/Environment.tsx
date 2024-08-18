@@ -24,7 +24,8 @@ export default class Environment extends Phaser.Scene{
     preload ()
     {
         this.load.image('tiles', '/tileset.png')
-        this.load.image('player', '/player.png')
+        this.load.spritesheet('player', '/player.png', { frameWidth: 16, frameHeight: 16 })
+        //this.load.image('player', '/player.png')
         this.load.image('arrow', '/arrow.png')
         this.load.tilemapTiledJSON('map', '/map01.json')
     }

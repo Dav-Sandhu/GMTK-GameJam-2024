@@ -28,6 +28,7 @@ export default class Player extends Phaser.Physics.Matter.Image{
         this.setRectangle(8, 2, { isStatic: false })
         this.setOrigin(0.5, 14/16)
         this.setFixedRotation()
+        this.setFrame(0)
 
         this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             const worldPoint = pointer.positionToCamera(this.scene.cameras.main) as Phaser.Math.Vector2

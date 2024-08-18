@@ -20,6 +20,7 @@ export default class Enemy extends Phaser.Physics.Matter.Image{
         this.scene = scene
         this.world = world
         this.setFixedRotation()
+        this.setFrame(0)
 
         this.player = player
 
