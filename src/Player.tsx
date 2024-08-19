@@ -132,7 +132,7 @@ export default class Player extends Phaser.Physics.Matter.Image {
     }
 
     getTilesWithinBounds(layer: Phaser.Tilemaps.TilemapLayer | null): Array<Phaser.Tilemaps.Tile> {
-        return layer?.getTilesWithinWorldXY(this.x, this.y, this.colBoxWidth, this.colBoxHeight) ?? []
+        return layer?.getTilesWithinWorldXY(this.x - this.colBoxWidth / 2, this.y + this.colBoxHeight / 2, this.colBoxWidth, this.colBoxHeight) ?? []
     }
 
     getDepth(): number {
