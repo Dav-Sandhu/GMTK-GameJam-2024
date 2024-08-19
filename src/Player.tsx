@@ -10,6 +10,11 @@ export default class Player extends Phaser.Physics.Matter.Image {
     sprite: Phaser.GameObjects.Sprite
     healthBar: Phaser.GameObjects.Graphics
 
+    originX: number = 0.5
+    originY: number = 14/16
+    colBoxWidth: number = 8
+    colBoxHeight: number = 2
+
     constructor(
         world: Phaser.Physics.Matter.World, 
         x: number, y: number, 
@@ -25,15 +30,15 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.maxHealth = health
         this.mov = new Phaser.Math.Vector2(0, 0)
 
-        this.setRectangle(8, 2, { isStatic: false })
-        this.setOrigin(0.5, 14/16)
+        this.setRectangle(this.colBoxWidth, this.colBoxHeight, { isStatic: false })
+        this.setOrigin(this.originX, this.originY)
         this.setFixedRotation()
         this.setFrame(0)
         this.setVisible(false)
 
         // Create the sprite for animations
         this.sprite = this.scene.add.sprite(x, y, texture)
-        this.sprite.setOrigin(0.5, 14/16)
+        this.sprite.setOrigin(this.originX, this.originY)
 
         this.healthBar = this.scene.add.graphics()
         this.healthBar.setDepth(100)
@@ -127,34 +132,13 @@ export default class Player extends Phaser.Physics.Matter.Image {
     }
 
     getTilesWithinBounds(layer: Phaser.Tilemaps.TilemapLayer | null): Array<Phaser.Tilemaps.Tile> {
-        const spriteWidth = this.width
-        const spriteHeight = this.height
-
-        const leftX = this.x - (this.width * 0.5)
-        const topY = this.y + (this.height * (14/16))
-
-        return layer?.getTilesWithinWorldXY(leftX, topY, spriteWidth, spriteHeight) ?? []
-    }
-
-    getCurrentTile(layer: Phaser.Tilemaps.TilemapLayer | null): Phaser.Tilemaps.Tile | undefined {
-        const bottomX = this.x + (this.width * 0.5)
-        const bottomY = this.y - (this.height * (14/16))
-
-        return layer?.getTileAtWorldXY(bottomX, bottomY)
+        return layer?.getTilesWithinWorldXY(this.x, this.y, this.colBoxWidth, this.colBoxHeight) ?? []
     }
 
     getDepth(): number {
-        const currentTile = this.getCurrentTile(this.scene.layers[0])
-
-        if (!currentTile) {
-            return 25
-        }
-
         const tilesLayer1 = this.getTilesWithinBounds(this.scene.layers[1])
         const tilesLayer2 = this.getTilesWithinBounds(this.scene.layers[2])
 
-        return [...tilesLayer1, ...tilesLayer2].some((tile) =>
-            tile.index != -1 && (tile.y < currentTile.y || (tile.x > currentTile.x && tile.y == currentTile.y))
-        ) ? 1 : 25
+        return [...tilesLayer1, ...tilesLayer2].some((tile) => tile.index != -1) ? 1 : 25
     }
 }
