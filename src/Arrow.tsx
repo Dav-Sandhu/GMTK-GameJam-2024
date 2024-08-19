@@ -9,7 +9,7 @@ export default class Arrow extends Phaser.Physics.Matter.Image{
         world: Phaser.Physics.Matter.World, 
         x: number, y: number, 
         texture: string | Phaser.Textures.Texture, 
-        scene: Environment){
+        scene: Environment) {
 
         super(world, x, y, texture)
 
@@ -25,14 +25,9 @@ export default class Arrow extends Phaser.Physics.Matter.Image{
         this.setFixedRotation()
 
         this.scene.matter.world.on('collisionstart', (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
-            const pairs = event.pairs
-
-            for (let i = 0; i < pairs.length; i++) {
-                const pair = pairs[i]
-    
-                if (pair.bodyA === this.body || pair.bodyB === this.body){
-
-                    const otherBody = pair.bodyA === this.body ? pair.bodyB : pair.bodyA
+            for (const pair of event.pairs) {
+                if (pair.bodyA == this.body || pair.bodyB == this.body){
+                    const otherBody = pair.bodyA == this.body ? pair.bodyB : pair.bodyA
 
                     if (otherBody.gameObject instanceof Player) {
                         const player = otherBody.gameObject as Player
