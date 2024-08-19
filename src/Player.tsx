@@ -41,33 +41,33 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.healthBar.setDepth(100)
         this.updateHealthBar()
 
-        this.scene.anims.create({
+        !this.scene.anims.exists('walk-right') ? this.scene.anims.create({
             key: 'walk-right',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [1, 2, 3, 4, 5, 6] }),
             frameRate: 8,
             repeat: -1
-        })
+        }) : null
 
-        this.scene.anims.create({
+        !this.scene.anims.exists('walk-left') ? this.scene.anims.create({
             key: 'walk-left',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [33, 34, 35, 36, 37, 38] }),
             frameRate: 8,
             repeat: -1
-        })
+        }) : null
 
-        this.scene.anims.create({
+        !this.scene.anims.exists('walk-up') ? this.scene.anims.create({
             key: 'walk-up',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [65, 66, 67, 68, 69, 70] }),
             frameRate: 8,
             repeat: -1
-        })
+        }) : null
 
-        this.scene.anims.create({
+        !this.scene.anims.exists('walk-down') ? this.scene.anims.create({
             key: 'walk-down',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [97, 98, 99, 100, 101, 102] }),
             frameRate: 8,
             repeat: -1
-        })
+        }) : null
 
         this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             const worldPoint = pointer.positionToCamera(this.scene.cameras.main) as Phaser.Math.Vector2
