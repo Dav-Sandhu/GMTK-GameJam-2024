@@ -39,25 +39,6 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.healthBar.setDepth(100)
         this.updateHealthBar()
 
-        this.scene.matter.world.on('collisionstart', (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
-            for (const pair of event.pairs) {
-                if (pair.bodyA == this.body || pair.bodyB == this.body) {
-                    const otherBody = pair.bodyA == this.body ? pair.bodyB : pair.bodyA
-
-                    const otherY = otherBody.gameObject?.body.position.y ?? -1
-                    const otherX = otherBody.gameObject?.body.position.x ?? -1
-
-                    if (this.y < otherY || (this.y == otherY && this.x >= otherX)) {
-                        this.sprite.setDepth(1) // Player is behind the object
-                    } else {
-                        this.sprite.setDepth(40) // Player is in front of the object
-                    }
-
-                    break
-                }
-            }
-        })
-
         if (!this.scene.anims.exists('walk-right') ||
             !this.scene.anims.exists('walk-left') ||
             !this.scene.anims.exists('walk-up') ||
