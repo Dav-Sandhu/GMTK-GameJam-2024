@@ -5,20 +5,14 @@ import Enemy from './Enemy'
 export default class Environment extends Phaser.Scene{
 
     player: Player | null
-    ground: Phaser.Tilemaps.TilemapLayer | null
-    walls: Phaser.Tilemaps.TilemapLayer | null
-    stack: Phaser.Tilemaps.TilemapLayer | null
-    roofs: Phaser.Tilemaps.TilemapLayer | null
+    layers: Array<Phaser.Tilemaps.TilemapLayer | null>
     enemy: Enemy | null
 
     constructor(){
         super()
         this.player = null
-        this.ground = null
-        this.stack = null
-        this.walls = null
-        this.roofs = null
         this.enemy = null
+        this.layers = []
     }
 
     preload ()
@@ -35,15 +29,19 @@ export default class Environment extends Phaser.Scene{
         const tileset = map.addTilesetImage('tileset', 'tiles')
 
         if (tileset !== null){
-            this.ground = map.createLayer('ground', tileset)
-            const boundary = map.createLayer('boundary', tileset)
-            this.walls = map.createLayer('walls', tileset)
 
-            this.roofs = map.createLayer('roofs', tileset)
-            this.stack = map.createLayer('stack', tileset)
+            for (let i = 1; i < 7; i++) {
+                const layer = map.createLayer('Tile Layer ' + i, tileset)
+                if (layer) {
+                    layer.setDepth((i - 1) * 10)
+                    this.layers.push(layer)
+                } else {
+                    this.layers.push(null)
+                }
+            }
 
-            const playerTile = this.ground?.getTileAt(9, 37)
-            const enemyTile = this.stack?.getTileAt(13, 1)
+            const playerTile = this.layers[0]?.getTileAt(9, 37)
+            const enemyTile = this.layers[0]?.getTileAt(9, 2)
 
             this.player = new Player(
                 this.matter.world, 
@@ -67,19 +65,11 @@ export default class Environment extends Phaser.Scene{
             )
             this.add.existing(this.enemy)
 
-            boundary?.setCollisionFromCollisionGroup()
-            this.walls?.setCollisionFromCollisionGroup()
-            this.ground?.setCollisionFromCollisionGroup()
+            this.layers[1]?.setCollisionFromCollisionGroup()
+            this.layers[1] ? this.matter.world.convertTilemapLayer(this.layers[1]) : null
 
-            boundary ? this.matter.world.convertTilemapLayer(boundary) : null
-            this.walls ? this.matter.world.convertTilemapLayer(this.walls) : null
-            this.ground ? this.matter.world.convertTilemapLayer(this.ground) : null
-
-            this.walls?.setDepth(10)
-            this.roofs?.setDepth(20)
-            this.stack?.setDepth(30)
-            this.enemy?.setDepth(40)
-            this.player?.sprite?.setDepth(40)
+            this.enemy?.setDepth(100)
+            this.player?.sprite?.setDepth(100)
         }
 
         //moves the camera to the map in the center of the screen
@@ -93,9 +83,9 @@ export default class Environment extends Phaser.Scene{
         
         //when mouse moves it will highlight the tile it is hovering over
         this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            this.ground?.forEachTile(t => t.tint = 0xffffff)
+            this.layers[0]?.forEachTile(t => t.tint = 0xffffff)
             const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2
-            const tile = this.ground?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
+            const tile = this.layers[0]?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
             tile ? tile.tint = 0xff0000 : null
             
         })
@@ -122,18 +112,14 @@ export default class Environment extends Phaser.Scene{
             const playerX = this.player.x
             const playerY = this.player.y + 6 //the 6 offset to go from origin to location of collision shape
 
-            const layers = [this.walls, this.stack, this.roofs] //layers that have collidable blocks
+            const tile = this.layers[1]?.getTileAtWorldXY(playerX, playerY)
+            const tileLeft = this.layers[1]?.getTileAtWorldXY(playerX + 8, playerY - 4)
 
-            layers.forEach(layer => {
-                const tile = layer?.getTileAtWorldXY(playerX, playerY)
-                const tileLeft = layer?.getTileAtWorldXY(playerX + 8, playerY - 4)
-
-                if (tile || tileLeft){
-                    this.player?.sprite?.setDepth(1) //player is behind a block
-                }else{
-                    this.player?.sprite?.setDepth(40) //player is in front of a block
-                }
-            })
+            if (tile || tileLeft){
+                this.player?.sprite?.setDepth(1) //player is behind a block
+            }else{
+                this.player?.sprite?.setDepth(40) //player is in front of a block
+            }
         }
     }
 }

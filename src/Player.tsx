@@ -38,7 +38,7 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.sprite.setOrigin(0.5, 14/16)
 
         this.healthBar = this.scene.add.graphics()
-        this.healthBar.setDepth(50)
+        this.healthBar.setDepth(100)
         this.updateHealthBar()
 
         this.scene.anims.create({
@@ -71,15 +71,19 @@ export default class Player extends Phaser.Physics.Matter.Image {
 
         this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             const worldPoint = pointer.positionToCamera(this.scene.cameras.main) as Phaser.Math.Vector2
-            const tile = this.scene.ground?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
-
-            if (tile && pointer.isDown) {
-                const targetX = tile.getCenterX()
-                const targetY = tile.getCenterY()
-                const direction = new Phaser.Math.Vector2(targetX - this.x, targetY - this.y).normalize()
-
-                this.mov_x = direction.x
-                this.mov_y = direction.y
+            const layer = this.scene.layers[0]
+        
+            if (layer) {
+                const tile = layer.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
+        
+                if (tile && pointer.isDown) {
+                    const targetX = tile.getCenterX()
+                    const targetY = tile.getCenterY()
+                    const direction = new Phaser.Math.Vector2(targetX - this.x, targetY - this.y).normalize()
+        
+                    this.mov_x = direction.x
+                    this.mov_y = direction.y
+                }
             }
         })
 
@@ -101,7 +105,9 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.healthBar.fillRect(this.x - 8, this.y - 20, 16 * (this.health / this.maxHealth), 2)
 
         if (this.health <= 0) {
-            this.scene.scene.restart()
+            this.scene.time.delayedCall(100, () => {
+                this.scene.scene.restart()
+            })
         }
     }
 
