@@ -25,6 +25,7 @@ export default class Environment extends Phaser.Scene{
 
     create ()
     {
+        this.layers = []
         const map = this.add.tilemap('map')
         const tileset = map.addTilesetImage('tileset', 'tiles')
 
@@ -40,8 +41,8 @@ export default class Environment extends Phaser.Scene{
                 }
             }
 
-            const playerTile = this.layers[0]?.getTileAt(9, 37)
-            const enemyTile = this.layers[0]?.getTileAt(9, 2)
+            const playerTile = this.layers[0]?.getTileAt(9, 37) || null
+            const enemyTile = this.layers[0]?.getTileAt(9, 2) || null
 
             this.player = new Player(
                 this.matter.world, 
