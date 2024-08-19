@@ -68,8 +68,11 @@ export default class Environment extends Phaser.Scene{
             this.layers[1]?.setCollisionFromCollisionGroup()
             this.layers[1] ? this.matter.world.convertTilemapLayer(this.layers[1]) : null
 
-            this.enemy?.setDepth(100)
-            this.player?.sprite?.setDepth(100)
+            this.layers[2]?.setCollisionFromCollisionGroup()
+            this.layers[2] ? this.matter.world.convertTilemapLayer(this.layers[2]) : null
+
+            this.enemy?.setDepth(25)
+            this.player?.sprite?.setDepth(25)
         }
 
         //moves the camera to the map in the center of the screen
@@ -118,7 +121,7 @@ export default class Environment extends Phaser.Scene{
             if (tile || tileLeft){
                 this.player?.sprite?.setDepth(1) //player is behind a block
             }else{
-                this.player?.sprite?.setDepth(40) //player is in front of a block
+                this.player?.sprite?.setDepth(25) //player is in front of a block
             }
         }
     }

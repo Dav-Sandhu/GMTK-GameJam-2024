@@ -13,8 +13,8 @@ export default function Config(ref: React.RefObject<HTMLInputElement>){
         physics: {
             default: 'matter',
             matter: {
-            gravity: { y: 0, x: 0 },
-            //debug: true,
+                gravity: { y: 0, x: 0 },
+                //debug: true,
             },
         },
         scene: Environment,

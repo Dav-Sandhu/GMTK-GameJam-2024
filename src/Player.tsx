@@ -105,9 +105,8 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.healthBar.fillRect(this.x - 8, this.y - 20, 16 * (this.health / this.maxHealth), 2)
 
         if (this.health <= 0) {
-            this.scene.time.delayedCall(100, () => {
-                this.scene.scene.restart()
-            })
+            this.health = 0
+            //this.scene.scene.restart() 
         }
     }
 
