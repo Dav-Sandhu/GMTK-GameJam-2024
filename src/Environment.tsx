@@ -82,6 +82,7 @@ export default class Environment extends Phaser.Scene{
 
         //default camera zoom
         this.cameras.main.zoomTo(2, 0)
+        this.cameras.main.roundPixels = true
 
         //when mouse moves it will highlight the tile it is hovering over
         this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
