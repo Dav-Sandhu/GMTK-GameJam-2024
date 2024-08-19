@@ -51,7 +51,7 @@ export default class Environment extends Phaser.Scene{
                 'player', 
                 this, 
                 50,
-                10
+                3
             )
             this.add.existing(this.player)
             this.cameras.main.startFollow(this.player)

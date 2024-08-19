@@ -41,31 +41,6 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.healthBar.setDepth(100)
         this.updateHealthBar()
 
-        this.scene.matter.world.on('collisionstart', (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
-
-            const pairs = event.pairs
-
-            for (let i = 0; i < pairs.length; i++) {
-                const pair = pairs[i]
-
-                if (pair.bodyA === this.body || pair.bodyB === this.body){
-
-                    const otherBody = pair.bodyA === this.body ? pair.bodyB : pair.bodyA
-
-                    const otherY = otherBody?.gameObject?.body?.position?.y || -1
-                    const otherX = otherBody?.gameObject?.body?.position?.x || -1
-            
-                    if (this.y < otherY || (this.y === otherY && this.x >= otherX)) {
-                        this.sprite.setDepth(1) // Player is behind the object
-                    } else {
-                        this.sprite.setDepth(40) // Player is in front of the object
-                    }
-
-                    break
-                }
-            }
-        })
-
         !this.scene.anims.exists('walk-right') ? this.scene.anims.create({
             key: 'walk-right',
             frames: this.scene.anims.generateFrameNumbers('player', { frames: [1, 2, 3, 4, 5, 6] }),
@@ -140,6 +115,8 @@ export default class Player extends Phaser.Physics.Matter.Image {
             this.mov_y * this.speed * (delta / 1000)
         )
 
+        this.sprite?.setDepth(this.getDepth())
+
         // Sync the sprite position with the Matter image
         this.sprite.setPosition(this.x, this.y)
         this.updateHealthBar()
@@ -149,5 +126,41 @@ export default class Player extends Phaser.Physics.Matter.Image {
         } else {
             this.sprite.setFrame(0)
         }
+    }
+
+    getTilesWithinBounds(layer: Phaser.Tilemaps.TilemapLayer | null){
+        const spriteWidth = this.width
+        const spriteHeight = this.height
+
+        const leftX = this.x - (this.width * 0.5)
+        const topY = this.y + (this.height * (14/16))
+
+        return layer ? layer.getTilesWithinWorldXY(leftX, topY, spriteWidth, spriteHeight) : []
+    }
+
+    getCurrentTile(layer: Phaser.Tilemaps.TilemapLayer | null){
+        const bottomX = this.x + (this.width * 0.5)
+        const bottomY = this.y - (this.height * (14/16))
+
+        return layer ?  layer.getTileAtWorldXY(bottomX, bottomY) : null
+    }
+
+    getDepth(){
+        const currentTile = this.getCurrentTile(this.scene.layers[0])
+
+        if (!currentTile) {
+            return 25
+        }
+
+        const tilesLayer1 = this.getTilesWithinBounds(this.scene.layers[1])
+        const tilesLayer2 = this.getTilesWithinBounds(this.scene.layers[2])
+
+        for (const tile of [...tilesLayer1, ...tilesLayer2]){
+            if (tile.index !== -1 && (tile.y < currentTile.y || (tile.x > currentTile.x && tile.y === currentTile.y))) {
+                return 1
+            }
+        }
+
+        return 25
     }
 }
