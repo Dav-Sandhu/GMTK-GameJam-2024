@@ -5,8 +5,8 @@ import Enemy from './Enemy'
 export default class Environment extends Phaser.Scene{
 
     player: Player | null
-    layers: Array<Phaser.Tilemaps.TilemapLayer | null>
     enemy: Enemy | null
+    layers: Array<Phaser.Tilemaps.TilemapLayer | null>
 
     constructor(){
         super()
@@ -31,12 +31,12 @@ export default class Environment extends Phaser.Scene{
 
         if (tileset !== null){
 
-            for (let i = 1; i < 7; i++) {
+            for (let i = 1; i < 7; i++){
                 const layer = map.createLayer('Tile Layer ' + i, tileset)
-                if (layer) {
+                if (layer){
                     layer.setDepth((i - 1) * 10)
                     this.layers.push(layer)
-                } else {
+                } else{
                     this.layers.push(null)
                 }
             }
@@ -89,16 +89,16 @@ export default class Environment extends Phaser.Scene{
         this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             this.layers[0]?.forEachTile(t => t.tint = 0xffffff)
             const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2
-            const tile = this.layers[0]?.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
+            const tile = this.layers[0]?.getTileAtWorldXY(worldPoint.x, worldPoint.y)
             tile ? tile.tint = 0xff0000 : null
             
         })
 
         //scroll wheel will zoom in and out 
         this.input.on('wheel', ({ deltaY }: { deltaY: number }) => {
-            if (deltaY > 0) {
+            if (deltaY > 0){
                 this.cameras.main.zoom -= 0.25
-            } else {
+            } else{
                 this.cameras.main.zoom += 0.25
             }
 
@@ -112,18 +112,6 @@ export default class Environment extends Phaser.Scene{
             this.player.movPlayer(delta)
 
             time * 1 //in order to build you must not have any unused variables
-            
-            const playerX = this.player.x
-            const playerY = this.player.y + 6 //the 6 offset to go from origin to location of collision shape
-
-            const tile = this.layers[1]?.getTileAtWorldXY(playerX, playerY)
-            const tileLeft = this.layers[1]?.getTileAtWorldXY(playerX + 8, playerY - 4)
-
-            if (tile || tileLeft){
-                this.player?.sprite?.setDepth(1) //player is behind a block
-            }else{
-                this.player?.sprite?.setDepth(25) //player is in front of a block
-            }
         }
     }
 }
