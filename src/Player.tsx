@@ -10,8 +10,8 @@ export default class Player extends Phaser.Physics.Matter.Image {
     sprite: Phaser.GameObjects.Sprite
     healthBar: Phaser.GameObjects.Graphics
 
-    originX: number = 0.5
-    originY: number = 14/16
+    oX: number = 0.5
+    oY: number = 15/16
     colBoxWidth: number = 8
     colBoxHeight: number = 2
 
@@ -31,14 +31,14 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.mov = new Phaser.Math.Vector2(0, 0)
 
         this.setRectangle(this.colBoxWidth, this.colBoxHeight, { isStatic: false })
-        this.setOrigin(this.originX, this.originY)
+        this.setOrigin(this.oX, this.oY)
         this.setFixedRotation()
         this.setFrame(0)
         this.setVisible(false)
 
         // Create the sprite for animations
         this.sprite = this.scene.add.sprite(x, y, texture)
-        this.sprite.setOrigin(this.originX, this.originY)
+        this.sprite.setOrigin(this.oX, this.oY)
 
         this.healthBar = this.scene.add.graphics()
         this.healthBar.setDepth(100)
