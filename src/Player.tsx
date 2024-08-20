@@ -125,8 +125,14 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.updateHealthBar()
 
         if (this.mov.lengthSq() != 0) {
-            this.sprite.anims.play(this.mov.x > 0 ? 'walk-right' : 'walk-left', true)
-        } else {
+
+            const x = this.mov.x
+            const y = this.mov.y
+
+            const animation = x > 0 && x >= y ? 'walk-right' : x < 0 && x < y ? 'walk-left' : y > 0 ? 'walk-up' : 'walk-down'
+
+            this.sprite.anims.play(animation, true)
+        }else{
             this.sprite.setFrame(0)
         }
     }
