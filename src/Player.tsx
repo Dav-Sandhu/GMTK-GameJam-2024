@@ -4,12 +4,16 @@ import Environment from './Environment'
 export default class Player extends Phaser.Physics.Matter.Image {
     scene: Environment
     speed: number
-    mov_x: number
-    mov_y: number
+    mov: Phaser.Math.Vector2
     health: number
     maxHealth: number
     sprite: Phaser.GameObjects.Sprite
     healthBar: Phaser.GameObjects.Graphics
+
+    originX: number = 0.5
+    originY: number = 14/16
+    colBoxWidth: number = 8
+    colBoxHeight: number = 2
 
     constructor(
         world: Phaser.Physics.Matter.World, 
@@ -24,50 +28,55 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.speed = speed
         this.health = health
         this.maxHealth = health
-        this.mov_x = 0
-        this.mov_y = 0
+        this.mov = new Phaser.Math.Vector2(0, 0)
 
-        this.setRectangle(8, 2, { isStatic: false })
-        this.setOrigin(0.5, 14/16)
+        this.setRectangle(this.colBoxWidth, this.colBoxHeight, { isStatic: false })
+        this.setOrigin(this.originX, this.originY)
         this.setFixedRotation()
         this.setFrame(0)
         this.setVisible(false)
 
         // Create the sprite for animations
         this.sprite = this.scene.add.sprite(x, y, texture)
-        this.sprite.setOrigin(0.5, 14/16)
+        this.sprite.setOrigin(this.originX, this.originY)
 
         this.healthBar = this.scene.add.graphics()
         this.healthBar.setDepth(100)
         this.updateHealthBar()
 
-        this.scene.anims.create({
-            key: 'walk-right',
-            frames: this.scene.anims.generateFrameNumbers('player', { frames: [1, 2, 3, 4, 5, 6] }),
-            frameRate: 8,
-            repeat: -1
-        })
+        if (!this.scene.anims.exists('walk-right') ||
+            !this.scene.anims.exists('walk-left') ||
+            !this.scene.anims.exists('walk-up') ||
+            !this.scene.anims.exists('walk-down')) {
 
-        this.scene.anims.create({
-            key: 'walk-left',
-            frames: this.scene.anims.generateFrameNumbers('player', { frames: [33, 34, 35, 36, 37, 38] }),
-            frameRate: 8,
-            repeat: -1
-        })
+            this.scene.anims.create({
+                key: 'walk-right',
+                frames: this.scene.anims.generateFrameNumbers('player', { frames: [1, 2, 3, 4, 5, 6] }),
+                frameRate: 8,
+                repeat: -1
+            })
 
-        this.scene.anims.create({
-            key: 'walk-up',
-            frames: this.scene.anims.generateFrameNumbers('player', { frames: [65, 66, 67, 68, 69, 70] }),
-            frameRate: 8,
-            repeat: -1
-        })
+            this.scene.anims.create({
+                key: 'walk-left',
+                frames: this.scene.anims.generateFrameNumbers('player', { frames: [33, 34, 35, 36, 37, 38] }),
+                frameRate: 8,
+                repeat: -1
+            })
 
-        this.scene.anims.create({
-            key: 'walk-down',
-            frames: this.scene.anims.generateFrameNumbers('player', { frames: [97, 98, 99, 100, 101, 102] }),
-            frameRate: 8,
-            repeat: -1
-        })
+            this.scene.anims.create({
+                key: 'walk-up',
+                frames: this.scene.anims.generateFrameNumbers('player', { frames: [65, 66, 67, 68, 69, 70] }),
+                frameRate: 8,
+                repeat: -1
+            })
+
+            this.scene.anims.create({
+                key: 'walk-down',
+                frames: this.scene.anims.generateFrameNumbers('player', { frames: [97, 98, 99, 100, 101, 102] }),
+                frameRate: 8,
+                repeat: -1
+            })
+        }
 
         this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             const worldPoint = pointer.positionToCamera(this.scene.cameras.main) as Phaser.Math.Vector2
@@ -75,21 +84,17 @@ export default class Player extends Phaser.Physics.Matter.Image {
         
             if (layer) {
                 const tile = layer.getTileAtWorldXY(worldPoint.x, worldPoint.y + 8)
-        
+
                 if (tile && pointer.isDown) {
                     const targetX = tile.getCenterX()
                     const targetY = tile.getCenterY()
-                    const direction = new Phaser.Math.Vector2(targetX - this.x, targetY - this.y).normalize()
-        
-                    this.mov_x = direction.x
-                    this.mov_y = direction.y
+                    this.mov = new Phaser.Math.Vector2(targetX - this.x, targetY - this.y).normalize()
                 }
             }
         })
 
         this.scene.input.on('pointerup', () => {
-            this.mov_x = 0
-            this.mov_y = 0
+            this.mov.reset()
         })
     }
 
@@ -105,26 +110,35 @@ export default class Player extends Phaser.Physics.Matter.Image {
         this.healthBar.fillRect(this.x - 8, this.y - 20, 16 * (this.health / this.maxHealth), 2)
 
         if (this.health <= 0) {
-            this.scene.time.delayedCall(100, () => {
-                this.scene.scene.restart()
-            })
+            this.scene.scene.restart()
         }
     }
 
     movPlayer(delta: number) {
-        this.setVelocity(
-            this.mov_x * this.speed * (delta / 1000), 
-            this.mov_y * this.speed * (delta / 1000)
-        )
+        const {x, y} = this.mov.clone().scale(this.speed * (delta / 1000))
+        this.setVelocity(x, y)
+
+        this.sprite.setDepth(this.getDepth())
 
         // Sync the sprite position with the Matter image
         this.sprite.setPosition(this.x, this.y)
         this.updateHealthBar()
 
-        if (this.mov_x !== 0 || this.mov_y !== 0) {
-            this.mov_x > 0 ? this.sprite.anims.play('walk-right', true) : this.sprite.anims.play('walk-left', true)
+        if (this.mov.lengthSq() != 0) {
+            this.sprite.anims.play(this.mov.x > 0 ? 'walk-right' : 'walk-left', true)
         } else {
             this.sprite.setFrame(0)
         }
+    }
+
+    getTilesWithinBounds(layer: Phaser.Tilemaps.TilemapLayer | null): Array<Phaser.Tilemaps.Tile> {
+        return layer?.getTilesWithinWorldXY(this.x - this.colBoxWidth / 2, this.y + this.colBoxHeight / 2, this.colBoxWidth, this.colBoxHeight) ?? []
+    }
+
+    getDepth(): number {
+        const tilesLayer1 = this.getTilesWithinBounds(this.scene.layers[1])
+        const tilesLayer2 = this.getTilesWithinBounds(this.scene.layers[2])
+
+        return [...tilesLayer1, ...tilesLayer2].some((tile) => tile.index != -1) ? 1 : 25
     }
 }
